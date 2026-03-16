@@ -3,23 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>歐客佬精品烘培 - 訂購系統</title>
+    <title>歐客佬精品烘培 - 翡翠精品莊園咖啡</title>
     <style>
         :root { --primary-brown: #5D4037; --soft-beige: #F9F7F2; --accent-gold: #C2A378; }
         body { font-family: sans-serif; background-color: var(--soft-beige); padding: 20px; }
         .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .header { text-align: center; margin-bottom: 20px; }
-        .product-hero { text-align: center; margin-bottom: 20px; border: 1px solid #EEE; padding: 10px; border-radius: 10px; }
+        .product-hero { text-align: center; margin-bottom: 20px; border: 1px solid #EEE; padding: 10px; border-radius: 10px; background: #fff; }
         .product-img { width: 100%; max-height: 600px; object-fit: contain; }
-        .tab-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .tab { padding: 8px 20px; cursor: pointer; border: 1px solid var(--accent-gold); border-radius: 50px; color: var(--accent-gold); }
+        .tab-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 8px 20px; cursor: pointer; border: 1px solid var(--accent-gold); border-radius: 50px; color: var(--accent-gold); font-weight: bold; }
         .tab.active { background: var(--accent-gold); color: white; }
+        
         .cart-section { display: grid; grid-template-columns: 1fr 300px; gap: 20px; margin-top: 30px; border-top: 2px solid #F0E6D6; padding-top: 20px; }
+        @media (max-width: 768px) { .cart-section { grid-template-columns: 1fr; } }
+        
         .cart-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #EEE; }
-        button { cursor: pointer; border-radius: 5px; border: none; }
-        .btn-add { background: var(--primary-brown); color: white; padding: 10px 20px; width: 100%; }
+        button { cursor: pointer; border-radius: 5px; border: none; font-weight: bold; }
+        .btn-add { background: var(--primary-brown); color: white; padding: 12px 20px; width: 100%; margin-top: 10px; }
         .btn-send { background: #27ae60; color: white; padding: 15px; width: 100%; font-size: 1.1em; }
-        input, select { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #DDD; border-radius: 5px; box-sizing: border-box; }
+        
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 5px 0 15px 0; 
+            border: 1px solid #DDD; 
+            border-radius: 5px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+            position: relative; 
+            z-index: 10; 
+            background-color: #fff !important;
+        }
+        label { font-weight: bold; color: var(--primary-brown); }
     </style>
 </head>
 <body>
@@ -27,7 +43,7 @@
 <div class="container">
     <div class="header">
         <h2>歐客佬精品烘培</h2>
-        <p>官網訂購連動系統</p>
+        <p>翡翠精品莊園咖啡 - 訂購系統</p>
     </div>
 
     <div class="tab-container">
@@ -41,11 +57,11 @@
     </div>
 
     <div style="background: #FFF; padding: 20px; border: 1px solid #F0E6D6; border-radius: 10px;">
-        <label>選擇品項口味</label>
+        <label>選擇品項口味 Item Select</label>
         <select id="prodSel" onchange="updateUI()"></select>
-        <label>數量</label>
+        <label>訂購數量 Quantity</label>
         <input type="number" id="prodQty" value="1" min="1">
-        <button class="btn-add" onclick="addToCart()">加入購物車</button>
+        <button class="btn-add" onclick="addToCart()">加入購物車 Add to Cart</button>
     </div>
 
     <div class="cart-section">
@@ -53,11 +69,13 @@
             <h3>🛒 購物清單</h3>
             <div id="cartDisplay">目前無商品</div>
         </div>
-        <div style="background: #FDFBF8; padding: 15px; border-radius: 10px;">
+        <div style="background: #FDFBF8; padding: 15px; border-radius: 10px; border: 1px solid #EEE;">
             <h3>收件資訊</h3>
-            <input type="text" id="uName" placeholder="姓名">
-            <input type="tel" id="uPhone" placeholder="電話">
-            <div style="font-size: 1.5em; color: #B22222; text-align: center; margin-bottom: 15px;">
+            <label>姓名 Name</label>
+            <input type="text" id="uName" placeholder="請填寫姓名">
+            <label>電話 Phone</label>
+            <input type="tel" id="uPhone" placeholder="請填寫電話">
+            <div style="font-size: 1.5em; color: #B22222; text-align: center; margin-bottom: 15px; font-weight: bold;">
                 Total: $<span id="totalPrice">0</span>
             </div>
             <button class="btn-send" id="sendBtn" onclick="submitToExcel()">確認送出訂單</button>
@@ -111,9 +129,11 @@
         const name = sel.value;
         const price = parseInt(sel.options[sel.selectedIndex].dataset.price);
         const qty = parseInt(document.getElementById('prodQty').value);
+        if (qty < 1) return;
         const exist = cart.find(i => i.name === name);
         if (exist) { exist.qty += qty; } else { cart.push({ name, price, qty }); }
         renderCart();
+        alert("已加入購物車！");
     }
 
     function renderCart() {
@@ -122,31 +142,49 @@
         let total = 0;
         disp.innerHTML = cart.map((item, idx) => {
             total += item.price * item.qty;
-            return `<div class="cart-item"><span>${item.name} x ${item.qty}</span><span>$${item.price * item.qty} <button onclick="cart.splice(${idx},1);renderCart()" style="color:red">刪除</button></span></div>`;
+            return `<div class="cart-item"><span>${item.name} x ${item.qty}</span><span>$${item.price * item.qty} <button onclick="cart.splice(${idx},1);renderCart()" style="color:red; background:none;">刪除</button></span></div>`;
         }).join('');
         document.getElementById('totalPrice').innerText = total;
     }
 
     async function submitToExcel() {
         if (cart.length === 0) return alert("請先加入商品");
-        const name = document.getElementById('uName').value;
-        const phone = document.getElementById('uPhone').value;
-        if (!name || !phone) return alert("請填寫姓名與電話");
+        const name = document.getElementById('uName').value.trim();
+        const phone = document.getElementById('uPhone').value.trim();
+        if (!name || !phone) return alert("請完整填寫姓名與電話");
 
         const btn = document.getElementById('sendBtn');
         btn.disabled = true; btn.innerText = "訂單傳送中...";
 
         const productDetails = cart.map(i => `${i.name}(${i.qty})`).join(', ');
+        const total = document.getElementById('totalPrice').innerText;
         const webAppUrl = "https://script.google.com/macros/s/AKfycbyCOEZ-kExo0zKACfySu73BN_6YDJjMXovcCcY__h9v0NVXxpV1mhuZPm2lnvPCmtWf/exec";
 
         try {
             await fetch(webAppUrl, {
                 method: "POST", mode: "no-cors",
-                body: JSON.stringify({ name, phone, productName: productDetails, totalPrice: document.getElementById('totalPrice').innerText, payment: "待確認" })
+                body: JSON.stringify({ name, phone, productName: productDetails, totalPrice: total, payment: "LINE Pay" })
             });
-            alert("🎉 訂單已傳送到 Excel！");
+
+            const lineMsg = encodeURIComponent(
+                `【翡翠精品莊園咖啡 - 訂單通知】\n` +
+                `------------------\n` +
+                `訂購人：${name}\n` +
+                `電話：${phone}\n` +
+                `品項明細：\n${productDetails.replace(/, /g, '\n')}\n` +
+                `------------------\n` +
+                `總金額：NT$ ${total}\n\n` +
+                `我已完成下單，請提供付款方式，謝謝！`
+            );
+
+            alert("🎉 訂單已成功記錄！點擊確定將開啟 LINE，請按下「傳送」按鈕。");
+            // 已更新為您的用戶 ID: 0424820198
+            window.location.href = `https://line.me/R/oaMessage/0424820198/?${lineMsg}`;
+
             cart = []; renderCart();
-        } catch (e) { alert("系統出錯，請檢查網路"); }
+            document.getElementById('uName').value = "";
+            document.getElementById('uPhone').value = "";
+        } catch (e) { alert("傳送失敗，請檢查網路"); }
         finally { btn.disabled = false; btn.innerText = "確認送出訂單"; }
     }
     switchCategory('生吐司');
